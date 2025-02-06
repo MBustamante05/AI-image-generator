@@ -4,7 +4,7 @@ import { protectedRoute } from "../middlewares/protectedRoute.middleware.js";
 
 const router = express.Router();
 
-router.post("/register", signup);
+router.post("/signup", signup);
 router.post("/login", login);
 router.get("/user", protectedRoute, getUser);
 

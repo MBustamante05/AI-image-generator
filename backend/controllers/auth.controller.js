@@ -1,13 +1,13 @@
-import User from "../models/user.model";
+import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { JWT_KEY } from "../../config";
+import { JWT_KEY } from "../../config.js";
 
 export const signup = async (req, res) => {
   try {
     const { email, name, password } = req.body;
 
-    const existingEmail = await User.findOne({email});
+    const existingEmail = await User.findOne({email: {$regex: `^${email}$`, $options: "i"}});
     if (existingEmail) {
       return res.status(400).json({message: "Email already exists"});
     }
@@ -20,6 +20,8 @@ export const signup = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const user = await User.create({email, name, password: hashedPassword});
+    await user.save();
+
     return res.status(200).json({ message: "Signup successful" });
 
   } catch (error) {
@@ -32,7 +34,7 @@ export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: {$regex: `^${email}$`, $options: "i"} });
 
     if (!user) {
       return res.status(404).json({message: "User not found"});

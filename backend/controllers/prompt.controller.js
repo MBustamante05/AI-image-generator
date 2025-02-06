@@ -1,4 +1,4 @@
-import Prompt from "../models/prompt.model";
+import Prompt from "../models/prompt.model.js";
 
 export const create = async (req, res) => {
   try {
