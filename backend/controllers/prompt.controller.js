@@ -1,9 +1,14 @@
 import Prompt from "../models/prompt.model.js";
+import { main } from "../lib/api.js";
 
 export const create = async (req, res) => {
   try {
-    const { prompt } = req.body;
-    const images = await main(prompt);
+    const { prompt, num = 3 } = req.query;
+    const images = await main(prompt, num);
+
+    if (!prompt) {
+      return res.status(400).json({ error: "Se requiere un término de búsqueda" });
+    }
 
     const user = req.user;
     if (user){

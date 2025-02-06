@@ -11,7 +11,13 @@ const promptSchema = new mongoose.Schema(
       required: [true, "Prompt is required!"],
     },
     imagesUrl: {
-      type: [String],
+      type: [
+        {
+          id: Number,
+          url: String,
+          photographer: String
+        }
+      ],
     }
   },
   {
