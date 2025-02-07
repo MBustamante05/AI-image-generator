@@ -1,34 +1,53 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from "react";
+import NavBar from "./components/NavBar"
+import axiosInstance from "./utils/axiosInstance";
 
+type ImageProps = {
+  id: number,
+  url: string,
+  photographer: string
+}
 function App() {
-  const [count, setCount] = useState(0)
+  const [images, setImages] = useState<ImageProps[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
+  const getImages = async () => {
+    setIsLoading(true);
+    try {
+      const res = await axiosInstance.get("/prompt/create", {
+        params: {
+          prompt: "A cute cat",
+          num: 3
+        }
+      });
+      console.log(res)
+      setImages(res.data);
+      setIsLoading(false);
+    } catch (error) {
+      console.log(error);
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    getImages();
+  },[]);
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div className="min-h-screen bg-gray-900 text-white py-7 px-14">
+      <NavBar />
+      {isLoading && (
+        <p>Loading...</p>
+      )}
+      {images && (
+        <div className="flex flex-wrap justify-center gap-4">
+          {images.map((image) => (
+            <div key={image.id} className="w-1/4 p-2">
+              <img className="w-full h-auto rounded" src={image.url} alt={image.photographer} />
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   )
 }
 
