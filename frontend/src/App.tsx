@@ -1,23 +1,20 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import NavBar from "./components/NavBar"
 import axiosInstance from "./utils/axiosInstance";
+import { ImageProps } from "./types/ImageProps";
+import { defaultImages } from "./mocks/defaultImages";
 
-type ImageProps = {
-  id: number,
-  url: string,
-  photographer: string
-}
+
 function App() {
-  const [images, setImages] = useState<ImageProps[]>([]);
+  const [images, setImages] = useState<ImageProps[]>(defaultImages);
   const [isLoading, setIsLoading] = useState(false);
 
-  const getImages = async () => {
+  const handleSearchImages = async (s: string) => {
     setIsLoading(true);
     try {
       const res = await axiosInstance.get("/prompt/create", {
         params: {
-          prompt: "A cute cat",
-          num: 3
+          prompt: s,
         }
       });
       console.log(res)
@@ -29,20 +26,18 @@ function App() {
     }
   }
 
-  useEffect(() => {
-    getImages();
-  },[]);
   return (
-    <div className="min-h-screen bg-gray-900 text-white py-7 px-14">
-      <NavBar />
+    <div className="min-h-screen bg-sky-900 text-white py-7 px-14">
+      <NavBar onSearch={(s) => handleSearchImages(s)}/>
       {isLoading && (
         <p>Loading...</p>
       )}
       {images && (
-        <div className="flex flex-wrap justify-center gap-4">
+        <div className="mt-30 grid grid-cols-3 gap-4 px-10">
           {images.map((image) => (
-            <div key={image.id} className="w-1/4 p-2">
-              <img className="w-full h-auto rounded" src={image.url} alt={image.photographer} />
+            <div key={image.id} className="w-full h-96 p-2">
+              <img className="w-full h-full object-cover object-center rounded-lg shadow-lg" src={image.url} alt={image.photographer} />
+              <p className="text-sm text-gray-300 font-medium mt-3">Photo by: <a href={image.url} className="font-semibold text-white hover:underline">{image.photographer}</a></p>
             </div>
           ))}
         </div>
